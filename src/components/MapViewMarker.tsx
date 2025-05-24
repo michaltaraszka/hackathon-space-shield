@@ -2,7 +2,7 @@ import { renderToString } from 'react-dom/server';
 import {Box} from "@chakra-ui/react";
 import L from "leaflet";
 import {TbAntenna, TbDrone} from "react-icons/tb";
-import { Circle, SVGOverlay, useMap } from "react-leaflet";
+import { Circle, SVGOverlay } from "react-leaflet";
 
 const droneIconHtml = renderToString(
     <Box
@@ -56,10 +56,8 @@ export const DroneStationCircle = ({ center }: { center: [number, number] }) => 
 
 
 export const DroneStationGradientCircle = ({ center }: { center: [number, number] }) => {
-    const map = useMap();
     const R = 6378137;
     const lat = center[0] * Math.PI / 180;
-    const lon = center[1] * Math.PI / 180;
     const dLat = (10000 / R) * (180 / Math.PI);
     const dLon = (10000 / (R * Math.cos(lat))) * (180 / Math.PI);
     const bounds = [
