@@ -7,7 +7,7 @@ const droneIconHtml = renderToString(
     <Box
         as={TbDrone}
         color="red.500"
-        boxSizing="content-box"
+        style={{ width: "32px", height: "32px" }}
         bg="white"
         borderRadius="full"
         p="1"
@@ -18,9 +18,8 @@ const droneIconHtml = renderToString(
 const droneStationHtml = renderToString(
     <Box
         as={TbAntenna}
-        boxSizing="content-box"
         color="red.500"
-        boxSize="32px"
+        style={{ width: "32px", height: "32px" }}
         bg="white"
         borderRadius="full"
         p="1"
