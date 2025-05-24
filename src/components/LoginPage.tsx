@@ -13,15 +13,13 @@ import {
     FormControl,
     FormHelperText,
     InputRightElement,
-    Image,
     Text,
     useColorModeValue
 } from "@chakra-ui/react";
-import {FaUserAlt, FaLock, FaShieldAlt} from "react-icons/fa";
+import {FaUserAlt, FaLock} from "react-icons/fa";
 
 const CFaUserAlt = chakra(FaUserAlt);
 const CFaLock = chakra(FaLock);
-const CFaShieldAlt = chakra(FaShieldAlt);
 
 interface LoginPageProps {
     onLogin?: (value: boolean) => void
@@ -53,7 +51,18 @@ const LoginPage: React.FC<LoginPageProps> = ({onLogin}) => {
                 spacing={6}
             >
                 <Box textAlign="center">
-                    <CFaShieldAlt color={primaryColor} boxSize="60px" mb={4}/>
+                    <Box display="flex" justifyContent="center" mb={4}>
+                        <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g>
+                                {/* Tarcza */}
+                                <path d="M30 5C30 5 10 10 10 25C10 45 30 55 30 55C30 55 50 45 50 25C50 10 30 5 30 5Z" fill="#2B6CB0" stroke="#2B6CB0" strokeWidth="2"/>
+                                {/* Oko */}
+                                <ellipse cx="30" cy="30" rx="10" ry="6" fill="#fff"/>
+                                <ellipse cx="30" cy="30" rx="4" ry="4" fill="#2B6CB0"/>
+                                <ellipse cx="30" cy="30" rx="2" ry="2" fill="#fff"/>
+                            </g>
+                        </svg>
+                    </Box>
                     <Heading color={primaryColor} size="xl" fontWeight="bold">
                         RESCUE EYE
                     </Heading>
