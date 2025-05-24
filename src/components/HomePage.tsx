@@ -1,24 +1,20 @@
 // src/HomePage.tsx
-import { Box, Flex, VStack, Heading, Text } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import "leaflet/dist/leaflet.css";
 import {MapViewComponent} from "./MapView.tsx";
+import Sidebar from "./Sidebar";
+import SidebarRight from "./SidebarRight";
+import { useState } from "react";
 
- export const HomePage: React.FC = () => {
+export const HomePage: React.FC = () => {
+    const [event, setEvent] = useState<any>(null);
     return (
         <Flex h="100vh" w="100vw" overflow="hidden">
-            {/* Sidebar */}
-            <Box w="300px" bg="gray.800" color="white" p={4}>
-                <VStack align="start">
-                    <Heading size="md">Map Sidebar</Heading>
-                    <Text>Some content here</Text>
-                    <Text>More controls</Text>
-                </VStack>
-            </Box>
-
-            {/* Map */}
+            <Sidebar />
             <Box flex="1" h="100%">
-                <MapViewComponent/>
+                <MapViewComponent onCreateEvent={setEvent} />
             </Box>
+            <SidebarRight event={event} onCancel={() => setEvent(null)} />
         </Flex>
     );
 };
