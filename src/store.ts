@@ -18,17 +18,23 @@ export const useStore = create<Store>()(
                 {
                     name: "SW_GS_01",
                     position: { latitude: 50.56696576099246, longitude: 22.056527842754125 },
-                    drones: []
+                    drones: [
+                        { model: "Dron Alfa", battery: 87, status: "Dostępny" }
+                    ]
                 },
                 {
                     name: "SW_GS_02",
                     position: { latitude: 50.56696576099246, longitude: 22.276527842754125 },
-                    drones: []
+                    drones: [
+                        { model: "Dron Gamma", battery: 95, status: "Dostępny" }
+                    ]
                 },
                 {
                     name: "SW_GS_03",
                     position: { latitude: 50.39696576099246, longitude: 22.316527842754125 },
-                    drones: []
+                    drones: [
+                        { model: "Dron Zeta", battery: 41, status: "Dostępny" }
+                    ]
                 }
             ],
             incidents: [],

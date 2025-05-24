@@ -1,3 +1,5 @@
 export interface Drone {
-    model: string
+    model: string;
+    battery: number;
+    status: string;
 }

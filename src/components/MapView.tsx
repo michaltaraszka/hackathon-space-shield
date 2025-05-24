@@ -1,8 +1,8 @@
 import {MapContainer, Marker, TileLayer, useMap, useMapEvent} from "react-leaflet";
 import {useStore} from "../store.ts";
 import L from "leaflet";
-import {Popover, Menu, MenuButton, MenuList, MenuItem, Button, Accordion, AccordionItem, AccordionButton, AccordionPanel, Box} from "@chakra-ui/react";
-import {DroneStationIcon, DroneStationCircle, DroneStationGradientCircle} from "./MapViewMarker.tsx";
+import {Popover, Button, Accordion, AccordionItem, AccordionButton, AccordionPanel, Box} from "@chakra-ui/react";
+import {DroneStationIcon, DroneStationGradientCircle} from "./MapViewMarker.tsx";
 import {useEffect, useRef, useState} from "react";
 import React from "react";
 
@@ -30,7 +30,7 @@ function ContextMenuHandler({ onContextMenu }: { onContextMenu: (e: any) => void
     return null;
 }
 
-export const MapViewComponent: React.FC<{ onCreateEvent?: (event: any) => void }> = ({ onCreateEvent }) => {
+export const MapViewComponent: React.FC<{ onCreateEvent?: (event: any) => void, selectedStation?: string | null }> = ({ onCreateEvent, selectedStation }) => {
     const centerLocation = useStore((state) => state.map.center);
     const droneStations = useStore((state) => state.stations)
     const [contextMenu, setContextMenu] = useState<{lat: number, lng: number, x: number, y: number} | null>(null);
@@ -96,10 +96,14 @@ export const MapViewComponent: React.FC<{ onCreateEvent?: (event: any) => void }
                 <ContextMenuHandler onContextMenu={handleContextMenu} />
                 {droneStations.map(station => (
                     <React.Fragment key={station.name}>
-                        <DroneStationGradientCircle center={[station.position.latitude, station.position.longitude]} />
+                        <DroneStationGradientCircle
+                            center={[station.position.latitude, station.position.longitude]}
+                            highlight={selectedStation === station.name}
+                        />
                         <Marker
                             position={[station.position.latitude, station.position.longitude]}
                             icon={DroneStationIcon}
+                            className={selectedStation === station.name ? 'highlighted-marker' : ''}
                         >
                             <Popover>Custom styled marker</Popover>
                         </Marker>
