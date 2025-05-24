@@ -1,8 +1,21 @@
-import {MapContainer, Marker, TileLayer} from "react-leaflet";
+import {MapContainer, Marker, TileLayer, useMap} from "react-leaflet";
 import {useStore} from "../store.ts";
 import L from "leaflet";
 import {Popover} from "@chakra-ui/react";
-import {DroneStationIcon} from "./MapViewMarker.tsx";
+import {DroneStationIcon, DroneStationCircle, DroneStationGradientCircle} from "./MapViewMarker.tsx";
+import {useEffect} from "react";
+
+function ScaleControl() {
+    const map = useMap();
+    useEffect(() => {
+        const scale = L.control.scale({ position: 'bottomleft', imperial: false });
+        scale.addTo(map);
+        return () => {
+            scale.remove();
+        };
+    }, [map]);
+    return null;
+}
 
 export const MapViewComponent: React.FC = () => {
     const centerLocation = useStore((state) => state.map.center);
@@ -19,13 +32,17 @@ export const MapViewComponent: React.FC = () => {
         zoom={13}
         style={{height: "100%", width: "100%"}}
     >
+        <ScaleControl />
         {droneStations.map(station => (
-            <Marker
-                position={[station.position.latitude, station.position.longitude]}
-                icon={DroneStationIcon}
-            >
-                <Popover>Custom styled marker</Popover>
-            </Marker>
+            <>
+                <DroneStationGradientCircle center={[station.position.latitude, station.position.longitude]} />
+                <Marker
+                    position={[station.position.latitude, station.position.longitude]}
+                    icon={DroneStationIcon}
+                >
+                    <Popover>Custom styled marker</Popover>
+                </Marker>
+            </>
         ))}
         <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
