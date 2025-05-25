@@ -13,6 +13,7 @@ export interface Store {
     updateMissionStatus: (missionId: string, status: MissionStatus) => void
     uploadMissionPhotos: (missionId: string, photo: Photo) => void
     updateDronePosition: (droneId: string, position: Location) => void
+    resetDroneAfterMission: (droneId: string) => void
     stations: DroneStation[]
     incidents: Incident[]
     addIncident: (incident: Incident) => void
@@ -39,6 +40,14 @@ export const useStore = create<Store>()(
                         status: 'NEW',
                         photos: []
                     }
+                    // set drone status to 'ON_MISSION'
+                    const droneStation = state.stations.find(s => s.drones.some(d => d.id === droneId));
+                    if (droneStation) {
+                        const drone = droneStation.drones.find(d => d.id === droneId);
+                        if (drone) {
+                            drone.status = 'ON_MISSION';
+                        }
+                    }
                     state.missions.push(mission);
                 }),
             updateMissionStatus: (missionId: string, status: Mission['status']) =>
@@ -47,6 +56,11 @@ export const useStore = create<Store>()(
                     if (mission) {
                         mission.status = status;
                         if (status === 'COMPLETED' || status === 'CANCELED' || status === 'FAILED') {
+                            if (mission.status === 'COMPLETED') {
+                                // Reset drone status to IDLE
+                                const incident = state.incidents.find(i => i.id === mission.incidentId);
+                                incident!.status = 'CLOSED';
+                            }
                             mission.endTime = new Date();
                         }
                     }
@@ -69,6 +83,18 @@ export const useStore = create<Store>()(
                         const drone = station.drones.find(d => d.id === droneId);
                         if (drone) {
                             drone.position = {...position};
+                        }
+                    }
+                }),
+            resetDroneAfterMission: (droneId: string) =>
+                set((state) => {
+                    const station = state.stations.find(s => s.drones.some(d => d.id === droneId));
+                    if (station) {
+                        const drone = station.drones.find(d => d.id === droneId);
+                        if (drone) {
+                            drone.position = {...station.position}; // Reset to station position
+                            drone.battery = 100; // Reset battery to 100%
+                            drone.status = 'IDLE'; // Reset status to IDLE
                         }
                     }
                 }),

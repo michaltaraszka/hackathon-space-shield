@@ -11,8 +11,9 @@ export const mockDroneMission = (
     drone: Drone,
     incident: Incident,
     updateDronePosition: (droneId: string, position: Location) => void,
-    updateDroneStatus: (droneId: string, status: MissionStatus) => void,
+    updateMissionStatus: (droneId: string, status: MissionStatus) => void,
     uploadDronePhoto: (missionId: string, photo: Photo) => void,
+    resetDroneAfterMission: (droneId: string) => void,
     timeScale: number = 1 // 1 = real-time; 2 = twice as fast, etc.
 ) => {
     const warmUpTime = (60 * 1000) / timeScale; // 1 minute warm-up time scaled by time
@@ -37,9 +38,9 @@ export const mockDroneMission = (
         elapsedTime += 1000;
 
         if (elapsedTime < warmUpTime) {
-            updateDroneStatus(missionId, 'WARM_UP'); // warming up
+            updateMissionStatus(missionId, 'WARM_UP'); // warming up
         } else if (elapsedTime < warmUpTime + flightTime) {
-            updateDroneStatus(missionId, 'ON_WAY');
+            updateMissionStatus(missionId, 'ON_WAY');
             const progress = (elapsedTime - warmUpTime) / flightTime;
             const currentPosition = {
                 latitude: homePosition.latitude + (incidentPosition.latitude - homePosition.latitude) * progress,
@@ -47,7 +48,7 @@ export const mockDroneMission = (
             };
             updateDronePosition(drone.id, currentPosition);
         } else if (elapsedTime < warmUpTime + flightTime + surveyTime) {
-            updateDroneStatus(missionId, 'SURVEY');
+            updateMissionStatus(missionId, 'SURVEY');
             const photo: Photo = {
                 rgbUrl: 'http://example.com/rgb_photo.jpg',
                 thermalUrl: 'http://example.com/thermal_photo.jpg',
@@ -55,7 +56,7 @@ export const mockDroneMission = (
             };
             uploadDronePhoto(missionId, photo);
         } else if (elapsedTime < totalMissionTime) {
-            updateDroneStatus(missionId, 'ON_RETURN');
+            updateMissionStatus(missionId, 'ON_RETURN');
             const progress = (totalMissionTime - elapsedTime) / flightTime;
             const currentPosition = {
                 latitude: homePosition.latitude + (incidentPosition.latitude - homePosition.latitude) * progress,
@@ -64,8 +65,9 @@ export const mockDroneMission = (
             updateDronePosition(drone.id, currentPosition);
         } else {
             clearInterval(interval);
-            updateDroneStatus(missionId, 'COMPLETED');
+            updateMissionStatus(missionId, 'COMPLETED');
             updateDronePosition(drone.id, homePosition);
+            resetDroneAfterMission(drone.id);
         }
     }, 100); // still runs every 1 real second
 };

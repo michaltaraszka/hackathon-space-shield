@@ -30,6 +30,7 @@ export const selectDroneStation = (location: Location, stations: DroneStation[])
             station.drones.map(drone => ({
                 ...station,
                 droneId: drone.id,
+                status: drone.status,
                 distance: getDistanceMeters(
                     location.latitude,
                     location.longitude,
@@ -40,6 +41,8 @@ export const selectDroneStation = (location: Location, stations: DroneStation[])
         )
         // limit to distance less than 10000 meters
         .filter(drone => drone.distance < 10000)
+        // filter out active drones (those with missions)
+        .filter(drone => drone.status == 'IDLE')
         .sort((a, b) => a.distance - b.distance)[0];
     console.log(nearestDrone);
     return nearestDrone;

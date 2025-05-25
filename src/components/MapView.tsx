@@ -1,6 +1,6 @@
-import {MapContainer, Marker, TileLayer, useMap} from "react-leaflet";
+import {MapContainer, Marker, Polyline, TileLayer, useMap} from "react-leaflet";
 import {useStore} from "../store.ts";
-import L from "leaflet";
+import L, {latLng} from "leaflet";
 import {Popover, Box} from "@chakra-ui/react";
 import React from "react";
 import {DroneStationIcon, DroneStationGradientCircle, IncidentIcon, DroneIcon} from "./MapViewMarker.tsx";
@@ -24,12 +24,25 @@ export const MapViewComponent: React.FC = () => {
     const centerLocation = useStore((state) => state.view.map.center);
     const droneStations = useStore((state) => state.stations)
     const incidents = useStore((state) => state.incidents);
-    const missions = useStore((state) => state.missions);
     const drones = droneStations.flatMap(station => station.drones);
-    const dronesWithMissions = drones.filter(drone => missions.some(mission => mission.droneId === drone.id))
-    // filter out drones that finish their missions
-    .filter(drone => !missions.some(mission => mission.droneId === drone.id && (mission.status === 'COMPLETED' || mission.status === 'CANCELED' || mission.status === 'FAILED')));
+    const dronesWithMissions = drones.filter(drone => drone.status == 'ON_MISSION');
     const selectedStation = useStore((state) => state.view.selectedStationId);
+
+    // get missions from the store
+    const missions = useStore((state) => state.missions);
+    const activeMissions = missions.filter(mission => mission.status !== 'COMPLETED' && mission.status !== 'CANCELED' && mission.status !== 'FAILED');
+
+    //get data to create polylines for active missions
+
+    const activeMissionPolylines = activeMissions.map(mission => {
+        const droneStationLocation = droneStations.find(station => station.id === mission.baseStationId)?.position;
+        const incidentLocation = incidents.find(incident => incident.id === mission.incidentId)?.data.location;
+        if (!droneStationLocation || !incidentLocation) return null;
+        return [
+                latLng(droneStationLocation.latitude, droneStationLocation.longitude),
+                latLng(incidentLocation.latitude, incidentLocation.longitude),
+            ]
+    });
 
     // Fix leaflet's default icon issue in many bundlers:
     delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -77,6 +90,19 @@ export const MapViewComponent: React.FC = () => {
                         icon={DroneIcon}
                     />
                 ))}
+                // Render polylines for active missions
+                {activeMissionPolylines.map((polyline, index) => {
+                    return (
+                        <Polyline
+                            key={index}
+                            positions={polyline!}
+                            color="blue"
+                            weight={3}
+                            opacity={0.7}
+                        />
+                    );
+                })}
+
                 <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution='&copy; OpenStreetMap contributors'

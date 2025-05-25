@@ -45,21 +45,21 @@ export const IncidentIcon = new L.DivIcon({
     html: incidentIconHtml,
     className: '', // remove default styles
     iconSize: [32, 32],
-    iconAnchor: [16, 32], // position the icon's bottom point correctly
+    iconAnchor: [16, 16], // position the icon's bottom point correctly
 });
 
 export const DroneIcon = new L.DivIcon({
     html: droneIconHtml,
     className: '',
     iconSize: [32, 32],
-    iconAnchor: [16, 32],
+    iconAnchor: [16, 16],
 });
 
 export const DroneStationIcon = new L.DivIcon({
     html: droneStationHtml,
     className: '',
     iconSize: [32, 32],
-    iconAnchor: [16, 32],
+    iconAnchor: [16, 16],
 })
 
 export const DroneStationCircle = ({ center }: { center: [number, number] }) => (
