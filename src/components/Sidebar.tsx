@@ -12,7 +12,7 @@ export const Sidebar: React.FC = () => {
         <Accordion allowToggle w="100%">
           <AccordionItem border="none">
             <AccordionButton>
-              <Heading size="sm" flex="1" textAlign="left">Stacje</Heading>
+              <Heading size="sm" flex="1" textAlign="left">Docking stations</Heading>
               <AccordionIcon />
             </AccordionButton>
             <AccordionPanel pb={2}>
@@ -20,7 +20,7 @@ export const Sidebar: React.FC = () => {
                 {stations.length === 0 ? (
                   <AccordionItem border="none">
                     <AccordionButton>
-                      <Text fontSize="sm" color="gray.400">Brak stacji</Text>
+                      <Text fontSize="sm" color="gray.400">No docking stations</Text>
                     </AccordionButton>
                   </AccordionItem>
                 ) : (
@@ -43,25 +43,25 @@ export const Sidebar: React.FC = () => {
                         <AccordionIcon />
                       </AccordionButton>
                       <AccordionPanel pb={2} bg="gray.900" borderRadius="md" mt={1}>
-                        <Text fontSize="xs" color="gray.400" mb={1}><b>Lokalizacja:</b> {station.position.latitude.toFixed(5)}, {station.position.longitude.toFixed(5)}</Text>
-                        <Text fontSize="xs" color="gray.400" mb={1}><b>Opis:</b> Stacja dokująca dronów w regionie operacyjnym.</Text>
+                        <Text fontSize="xs" color="gray.400" mb={1}><b>Localization:</b> {station.position.latitude.toFixed(5)}, {station.position.longitude.toFixed(5)}</Text>
+                        <Text fontSize="xs" color="gray.400" mb={1}><b>Description:</b> Docking station</Text>
                         {station.drones && station.drones.length > 0 ? (
                           station.drones.map((drone: any, idx: number) => (
                             <Box key={drone.name || idx} mb={2} p={2} bg="gray.800" borderRadius="md">
-                              <Text fontSize="xs" color="gray.300"><b>Dron:</b> {drone.name || `Dron #${idx+1}`}</Text>
-                              <Text fontSize="xs" color="gray.300"><b>Poziom naładowania:</b></Text>
+                              <Text fontSize="xs" color="gray.300"><b>Drone:</b> {drone.name || `Dron #${idx+1}`}</Text>
+                              <Text fontSize="xs" color="gray.300"><b>Charge:</b></Text>
                               <Progress value={drone.battery || 100} size="xs" colorScheme={drone.battery > 50 ? "green" : drone.battery > 20 ? "yellow" : "red"} mb={1}/>
-                              <Text fontSize="xs" color="gray.300"><b>Status:</b> {drone.status || "dostępny"}</Text>
+                              <Text fontSize="xs" color="gray.300"><b>State:</b> {drone.status || "available"}</Text>
                             </Box>
                           ))
                         ) : (
                           <Box mb={2} p={2} bg="gray.800" borderRadius="md">
-                            <Text fontSize="xs" color="gray.300"><b>Dron:</b> Brak danych</Text>
-                            <Text fontSize="xs" color="gray.300"><b>Poziom naładowania:</b> -</Text>
-                            <Text fontSize="xs" color="gray.300"><b>Status:</b> -</Text>
+                            <Text fontSize="xs" color="gray.300"><b>Drone:</b> Brak danych</Text>
+                            <Text fontSize="xs" color="gray.300"><b>Charge:</b> -</Text>
+                            <Text fontSize="xs" color="gray.300"><b>State:</b> -</Text>
                           </Box>
                         )}
-                        <Text fontSize="xs" color="gray.400" mt={2}><b>Ostatnia aktualizacja:</b> 2 minuty temu</Text>
+                        <Text fontSize="xs" color="gray.400" mt={2}><b>Last update:</b> 2 minutes ago</Text>
                       </AccordionPanel>
                     </AccordionItem>
                   ))

@@ -67,7 +67,7 @@ const LoginPage: React.FC<LoginPageProps> = ({onLogin}) => {
                         RESCUE EYE
                     </Heading>
                     <Text color="gray.600" mt={2} fontSize="sm">
-                        System Szybkiego Reagowania i Oceny Sytuacji
+                        System for Rapid Response and Situation Assessment
                     </Text>
                 </Box>
 
@@ -90,7 +90,7 @@ const LoginPage: React.FC<LoginPageProps> = ({onLogin}) => {
                                     />
                                     <Input 
                                         type="email" 
-                                        placeholder="Adres email służbowy"
+                                        placeholder="E-mail address"
                                         size="lg"
                                         borderColor={borderColor}
                                         _hover={{ borderColor: secondaryColor }}
@@ -106,7 +106,7 @@ const LoginPage: React.FC<LoginPageProps> = ({onLogin}) => {
                                     />
                                     <Input
                                         type={showPassword ? "text" : "password"}
-                                        placeholder="Hasło"
+                                        placeholder="Password"
                                         size="lg"
                                         borderColor={borderColor}
                                         _hover={{ borderColor: secondaryColor }}
@@ -120,13 +120,13 @@ const LoginPage: React.FC<LoginPageProps> = ({onLogin}) => {
                                             variant="ghost"
                                             color={secondaryColor}
                                         >
-                                            {showPassword ? "Ukryj" : "Pokaż"}
+                                            {showPassword ? "Hide" : "Show"}
                                         </Button>
                                     </InputRightElement>
                                 </InputGroup>
                                 <FormHelperText textAlign="right">
                                     <Link color={secondaryColor} fontSize="sm">
-                                        Zapomniałeś hasła?
+                                        Forgot your password?
                                     </Link>
                                 </FormHelperText>
                             </FormControl>
@@ -139,13 +139,13 @@ const LoginPage: React.FC<LoginPageProps> = ({onLogin}) => {
                                 width="full"
                                 onClick={() => onLogin ? onLogin(true) : null}
                             >
-                                Zaloguj się
+                                Login
                             </Button>
                         </Stack>
                     </form>
                 </Box>
-                <Text color="gray.600" fontSize="sm">
-                    Dostęp tylko dla upoważnionych służb
+                <Text color="gray.600" fontSize="sm" textAlign="center" mt={4}>
+                    Rescue Eye is a system designed to support rapid response and situation assessment in emergency situations.<br/>It provides real-time data and analytics to help authorized personnel make informed decisions.
                 </Text>
             </Stack>
         </Flex>
