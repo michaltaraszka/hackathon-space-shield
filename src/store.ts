@@ -69,6 +69,10 @@ export const useStore = create<Store>()(
                 set((state) => {
                     const mission = state.missions.find(m => m.missionId === missionId);
                     if (mission) {
+                        // don't add duplicate photos
+                        if (mission.photos.some(p => p.rgbUrl === photo.rgbUrl && p.thermalUrl === photo.thermalUrl && p.lidarUrl === photo.lidarUrl)) {
+                            return;
+                        }
                         mission.photos.push({
                             rgbUrl: photo.rgbUrl,
                             thermalUrl: photo.thermalUrl,

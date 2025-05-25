@@ -77,7 +77,10 @@ export const MapViewComponent: React.FC = () => {
                         </Marker>
                     </React.Fragment>
                 ))}
-                {incidents.map(incident => (
+                {incidents
+                    // filter out incidents that are closed
+                    .filter(incident => incident.status !== 'CLOSED')
+                    .map(incident => (
                     <Marker
                         position={[incident.data.location!.latitude, incident.data.location!.longitude]}
                         icon={IncidentIcon}

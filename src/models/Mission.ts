@@ -1,9 +1,9 @@
 export type MissionStatus = 'NEW' | 'WARM_UP' | 'ON_WAY' | 'SURVEY' | 'ON_RETURN' | 'COMPLETED' | 'CANCELED' | 'FAILED';
 
 export interface Photo {
-    rgbUrl: string // URL to the RGB photo
-    thermalUrl: string // URL to the thermal photo
-    lidarUrl: string // URL to the LiDAR photo
+    rgbUrl?: string // URL to the RGB photo
+    thermalUrl?: string // URL to the thermal photo
+    lidarUrl?: string // URL to the LiDAR photo
 }
 
 export interface Mission {

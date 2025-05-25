@@ -4,6 +4,7 @@ import type { Incident } from "../models/Incident.ts";
 import { selectDroneStation } from "../services.ts";
 import { mockDroneMission } from "../mockServices.ts";
 import type { Location } from "../models/Location.ts";
+import {PhotoGalleryPopover} from "./PhotoGalleryPopover.tsx";
 
 export interface IncidentViewProps {
     incidentId: string;
@@ -55,6 +56,7 @@ export const IncidentView: React.FC<IncidentViewProps> = ({ incidentId }) => {
                     {activeMission.endTime && (
                         <Text mb={1}><b>End:</b> {activeMission.endTime.toLocaleString()}</Text>
                     )}
+                    <PhotoGalleryPopover photos={activeMission?.photos || []} />
                 </>
             ) : (
                 <>

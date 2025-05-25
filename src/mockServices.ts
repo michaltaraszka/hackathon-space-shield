@@ -34,6 +34,8 @@ export const mockDroneMission = (
     const totalMissionTime = warmUpTime + flightTime + surveyTime + flightTime;
     let elapsedTime = 0;
 
+    const photos: Photo[] = [{rgbUrl: 'rgb_0001.webp'}, {thermalUrl: 'infrared_0001.webp'}, {rgbUrl: 'rgb_0002.webp'}, {rgbUrl: 'rgb_0003.webp'}];
+
     const interval = setInterval(() => {
         elapsedTime += 1000;
 
@@ -49,12 +51,13 @@ export const mockDroneMission = (
             updateDronePosition(drone.id, currentPosition);
         } else if (elapsedTime < warmUpTime + flightTime + surveyTime) {
             updateMissionStatus(missionId, 'SURVEY');
-            const photo: Photo = {
-                rgbUrl: 'http://example.com/rgb_photo.jpg',
-                thermalUrl: 'http://example.com/thermal_photo.jpg',
-                lidarUrl: 'http://example.com/lidar_photo.jpg'
-            };
-            uploadDronePhoto(missionId, photo);
+            // create function that uploads 10 photos every 10 seconds
+            if (elapsedTime % 10000 === 0) {
+                const photoIndex = Math.floor((elapsedTime - warmUpTime - flightTime) / 10000);
+                if (photoIndex < photos.length) {
+                    uploadDronePhoto(missionId, photos[photoIndex]);
+                }
+            }
         } else if (elapsedTime < totalMissionTime) {
             updateMissionStatus(missionId, 'ON_RETURN');
             const progress = (totalMissionTime - elapsedTime) / flightTime;
