@@ -1,4 +1,4 @@
-# Drone Mission Control Dashboard
+# RescuEye - Drone Mission Control Dashboard
 
 A web application for managing drone stations, missions, and incident response. Built with React, TypeScript, Zustand, and Chakra UI.
 
