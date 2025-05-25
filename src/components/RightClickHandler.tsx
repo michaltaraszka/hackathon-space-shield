@@ -6,8 +6,8 @@ export const RightClickHandler: React.FC = () => {
     useMapEvents({
         contextmenu(e) {
             console.log("Right click at", e.latlng);
-            const { lat, lng } = e.latlng;
-            open({latitude: lat, longitude: lng})
+            open({latitude: e.latlng.lat, longitude: e.latlng.lng}, {x: e.originalEvent.clientX, y: e.originalEvent.clientY});
+
         },
     });
     return null;

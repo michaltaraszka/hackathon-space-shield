@@ -1,20 +1,18 @@
 import type {Location} from "./Location.ts";
+import type {EventType} from "../components/IncidentReportPopup.tsx";
 
-export type IncidentType = 'collision' | 'breakdown' | 'obstruction' | 'fire' | 'other';
-export type IncidentPriority =  'low' | 'medium' | 'high' | 'critical';
+export type IncidentType = EventType;
 
 export interface IncidentData {
-    incidentType?: IncidentType[];
-    numberOfCasualties?: number;
-    numberOfVehicles?: number;
-    priority?: IncidentPriority;
-    location?: Location; // or use { lat: number; lng: number } if you prefer coordinates
-    locationNotes?: string;
+    incidentType: IncidentType
+    location: Location;
 }
 
 export type IncidentPopupView =  {
     visible: boolean
-    open: (location: Location) => void
+    location: Location
+    position: {x: number, y: number}
+    open: (location: Location, position: {x: number, y: number}) => void
     save: (incident: IncidentData) => void
     cancel: () => void
-} & IncidentData;
+};

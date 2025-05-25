@@ -3,9 +3,16 @@ import {immer} from 'zustand/middleware/immer';
 import type {DroneStation} from "./models/DroneStation";
 import type {Incident, IncidentStatus} from "./models/Incident.ts";
 import type {MapView} from "./models/MapView.ts";
-import type {IncidentData, IncidentPopupView} from "./models/IncidentPopupView.ts";
+import type {IncidentData, IncidentPopupView, IncidentType} from "./models/IncidentPopupView.ts";
+import type {Mission, MissionStatus, Photo} from "./models/Mission.ts";
+import type {Location} from "./models/Location.ts";
 
 export interface Store {
+    missions: Mission[]
+    createMission: (missionId: string, droneId: string, baseStationId: string, incidentId: string) => void
+    updateMissionStatus: (missionId: string, status: MissionStatus) => void
+    uploadMissionPhotos: (missionId: string, photo: Photo) => void
+    updateDronePosition: (droneId: string, position: Location) => void
     stations: DroneStation[]
     incidents: Incident[]
     addIncident: (incident: Incident) => void
@@ -18,19 +25,77 @@ export interface Store {
 export const useStore = create<Store>()(
     immer((set) => (
         {
+            missions: [],
+            createMission: (missionId: string, droneId: string, baseStationId: string, incidentId: string) =>
+                set((state) => {
+                    const mission: Mission = {
+                        missionId: missionId,
+                        droneId: droneId,
+                        baseStationId: baseStationId,
+                        incidentId: incidentId,
+                        startTime: new Date(),
+                        status: 'NEW',
+                        photos: []
+                    }
+                    state.missions.push(mission);
+                }),
+            updateMissionStatus: (missionId: string, status: Mission['status']) =>
+                set((state) => {
+                    const mission = state.missions.find(m => m.missionId === missionId);
+                    if (mission) {
+                        mission.status = status;
+                        if (status === 'COMPLETED' || status === 'CANCELED' || status === 'FAILED') {
+                            mission.endTime = new Date();
+                        }
+                    }
+                }),
+            uploadMissionPhotos: (missionId: string, photo: { rgbUrl: string, thermalUrl: string, lidarUrl: string }) =>
+                set((state) => {
+                    const mission = state.missions.find(m => m.missionId === missionId);
+                    if (mission) {
+                        mission.photos.push({
+                            rgbUrl: photo.rgbUrl,
+                            thermalUrl: photo.thermalUrl,
+                            lidarUrl: photo.lidarUrl
+                        });
+                    }
+                }),
+            updateDronePosition: (droneId: string, position: Location) =>
+                set((state) => {
+                    const station = state.stations.find(s => s.drones.some(d => d.id === droneId));
+                    if (station) {
+                        const drone = station.drones.find(d => d.id === droneId);
+                        if (drone) {
+                            drone.position = {...position};
+                        }
+                    }
+                }),
             stations: [
                 {
-                    name: "SW_GS_01",
+                    id: "SW_GS_01",
                     position: { latitude: 50.56696576099246, longitude: 22.056527842754125 },
-                    drones: []
+                    drones: [
+                        {
+                            id: "SW_D_01",
+                            position: { latitude: 50.56696576099246, longitude: 22.056527842754125 },
+                            battery: 100,
+                            status: 'IDLE',
+                        },
+                        {
+                            id: "SW_D_02",
+                            position: { latitude: 50.56696576099246, longitude: 22.056527842754125 },
+                            battery: 100,
+                            status: 'IDLE',
+                        }
+                    ]
                 },
                 {
-                    name: "SW_GS_02",
+                    id: "SW_GS_02",
                     position: { latitude: 50.56696576099246, longitude: 22.276527842754125 },
                     drones: []
                 },
                 {
-                    name: "SW_GS_03",
+                    id: "SW_GS_03",
                     position: { latitude: 50.39696576099246, longitude: 22.316527842754125 },
                     drones: []
                 }
@@ -50,28 +115,27 @@ export const useStore = create<Store>()(
                 },
                 incidentPopup: {
                     visible: false,
-                    open: (location) => {
+                    location: { latitude: 0, longitude: 0 },
+                    position: { x: 0, y: 0 },
+                    open: (location, position) => {
                         set((state) => {
                             state.view.incidentPopup.visible = true;
                             state.view.incidentPopup.location = location;
+                            state.view.incidentPopup.position = position;
                         })
                     },
-                    save: (view) => {
+                    save: (data) => {
                         set((state) => {
                             state.view.incidentPopup.visible = false;
-                            state.view.incidentPopup.incidentType = view.incidentType;
-                            state.view.incidentPopup.numberOfCasualties = view.numberOfCasualties;
-                            state.view.incidentPopup.numberOfVehicles = view.numberOfVehicles;
-                            state.view.incidentPopup.priority = view.priority;
-                            state.view.incidentPopup.locationNotes = view.locationNotes;
+                        });
+                        set((state) => {
+                            state.view.incidentPopup.position = {x: 0, y: 0};
                             const incidentData: IncidentData = {
-                                location: state.view.incidentPopup.location,
-                                numberOfCasualties: state.view.incidentPopup.numberOfCasualties,
-                                numberOfVehicles: state.view.incidentPopup.numberOfVehicles,
-                                priority: state.view.incidentPopup.priority,
-                                locationNotes: state.view.incidentPopup.locationNotes,
+                                location: data.location,
+                                incidentType: data.incidentType as IncidentType,
                             };
                             const incident = {
+                                id: `incident_uuid_${Math.random().toString(36).substr(2, 9)}`,
                                 status: 'NEW' as IncidentStatus,
                                 data: incidentData,
                             }
@@ -81,12 +145,8 @@ export const useStore = create<Store>()(
                     cancel: () => {
                         set((state) => {
                             state.view.incidentPopup.visible = false;
-                            state.view.incidentPopup.location = undefined;
-                            state.view.incidentPopup.incidentType = undefined;
-                            state.view.incidentPopup.numberOfCasualties = undefined;
-                            state.view.incidentPopup.numberOfVehicles = undefined;
-                            state.view.incidentPopup.priority = undefined;
-                            state.view.incidentPopup.locationNotes = undefined;
+                            state.view.incidentPopup.location = {latitude: 0, longitude: 0};
+                            state.view.incidentPopup.position = {x: 0, y: 0};
                         });
                     }
                 }

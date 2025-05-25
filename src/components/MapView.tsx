@@ -1,11 +1,12 @@
-import {MapContainer, Marker, TileLayer, useMap, useMapEvent} from "react-leaflet";
+import {MapContainer, Marker, TileLayer, useMap} from "react-leaflet";
 import {useStore} from "../store.ts";
 import L from "leaflet";
-import {Popover, Button, Accordion, AccordionItem, AccordionButton, AccordionPanel, Box} from "@chakra-ui/react";
-import {useRef, useState} from "react";
+import {Popover, Box} from "@chakra-ui/react";
 import React from "react";
-import {DroneStationIcon, DroneStationGradientCircle, IncidentIcon} from "./MapViewMarker.tsx";
+import {DroneStationIcon, DroneStationGradientCircle, IncidentIcon, DroneIcon} from "./MapViewMarker.tsx";
 import {useEffect} from "react";
+import {IncidentReportPopup} from "./IncidentReportPopup.tsx";
+import {RightClickHandler} from "./RightClickHandler.tsx";
 
 function ScaleControl() {
     const map = useMap();
@@ -19,24 +20,15 @@ function ScaleControl() {
     return null;
 }
 
-const EVENT_TYPES = [
-    { label: "Wypadek", value: "accident" },
-    { label: "Pożar", value: "fire" },
-    { label: "Zdarzenie społeczne", value: "social" },
-    { label: "Inne", value: "other" },
-];
-
-function ContextMenuHandler({ onContextMenu }: { onContextMenu: (e: any) => void }) {
-    useMapEvent('contextmenu', onContextMenu);
-    return null;
-}
-
-export const MapViewComponent: React.FC<{ onCreateEvent?: (event: any) => void }> = ({ onCreateEvent }) => {
+export const MapViewComponent: React.FC = () => {
     const centerLocation = useStore((state) => state.view.map.center);
     const droneStations = useStore((state) => state.stations)
-    const [contextMenu, setContextMenu] = useState<{lat: number, lng: number, x: number, y: number} | null>(null);
-    const [showTypeMenu, setShowTypeMenu] = useState(false);
     const incidents = useStore((state) => state.incidents);
+    const missions = useStore((state) => state.missions);
+    const drones = droneStations.flatMap(station => station.drones);
+    const dronesWithMissions = drones.filter(drone => missions.some(mission => mission.droneId === drone.id))
+    // filter out drones that finish their missions
+    .filter(drone => !missions.some(mission => mission.droneId === drone.id && (mission.status === 'COMPLETED' || mission.status === 'CANCELED' || mission.status === 'FAILED')));
 
     // Fix leaflet's default icon issue in many bundlers:
     delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -46,47 +38,6 @@ export const MapViewComponent: React.FC<{ onCreateEvent?: (event: any) => void }
         shadowUrl: import('leaflet/dist/images/marker-shadow.png'),
     });
 
-    // Funkcja do obsługi wyboru typu zdarzenia
-    const handleTypeSelect = (type: string) => {
-        if (contextMenu && onCreateEvent) {
-            const event = {
-                id: Math.random().toString(36).substring(2, 9),
-                type,
-                lat: contextMenu.lat,
-                lng: contextMenu.lng
-            };
-            onCreateEvent(event);
-        }
-        setContextMenu(null);
-        setShowTypeMenu(false);
-    };
-
-    // Obsługa kliknięcia PPM na mapie
-    const handleContextMenu = (e: any) => {
-        e.originalEvent.preventDefault();
-        setContextMenu({
-            lat: e.latlng.lat,
-            lng: e.latlng.lng,
-            x: e.originalEvent.clientX,
-            y: e.originalEvent.clientY
-        });
-        setShowTypeMenu(false);
-    };
-
-    // Obsługa zamykania menu po kliknięciu poza nim
-    const menuRef = useRef<HTMLDivElement | null>(null);
-    useEffect(() => {
-        if (!contextMenu) return;
-        const handleClick = (e: MouseEvent) => {
-            if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-                setContextMenu(null);
-                setShowTypeMenu(false);
-            }
-        };
-        setTimeout(() => document.addEventListener('mousedown', handleClick), 0);
-        return () => document.removeEventListener('mousedown', handleClick);
-    }, [contextMenu]);
-
     return (
         <Box position="relative" w="100%" h="100%">
             <MapContainer
@@ -94,11 +45,11 @@ export const MapViewComponent: React.FC<{ onCreateEvent?: (event: any) => void }
                 zoom={13}
                 style={{height: "100%", width: "100%"}}
             >
+                <RightClickHandler/>
                 <ScaleControl />
-                <ContextMenuHandler onContextMenu={handleContextMenu} />
 
                 {droneStations.map(station => (
-                    <React.Fragment key={station.name}>
+                    <React.Fragment key={station.id}>
                         <DroneStationGradientCircle center={[station.position.latitude, station.position.longitude]} />
                         <Marker
                             position={[station.position.latitude, station.position.longitude]}
@@ -114,54 +65,19 @@ export const MapViewComponent: React.FC<{ onCreateEvent?: (event: any) => void }
                         icon={IncidentIcon}
                     />
                 ))}
+                {dronesWithMissions.map(drone => (
+                    <Marker
+                        key={drone.id}
+                        position={[drone.position.latitude, drone.position.longitude]}
+                        icon={DroneIcon}
+                    />
+                ))}
                 <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution='&copy; OpenStreetMap contributors'
                 />
             </MapContainer>
-
-            {/* Menu kontekstowe */}
-            {contextMenu && (
-                <Box ref={menuRef} position="fixed" left={contextMenu.x} top={contextMenu.y} zIndex={9999} bg="white" borderRadius="md" boxShadow="md" px={2} py={1} minW="auto" w="auto" fontSize="xs" border="1px solid #e5e7eb">
-                    {!showTypeMenu ? (
-                        <Box
-                            as="button"
-                            display="flex"
-                            alignItems="center"
-                            gap={1}
-                            px={2}
-                            py={0.5}
-                            borderRadius="sm"
-                            fontSize="xs"
-                            color="gray.700"
-                            bg="white"
-                            _hover={{ bg: 'gray.100' }}
-                            border="none"
-                            boxShadow="none"
-                            onClick={() => setShowTypeMenu(true)}
-                            cursor="pointer"
-                            minW="auto"
-                        >
-                            <Box as="span" fontWeight="bold" fontSize="sm" lineHeight={1}>+</Box> Utwórz zdarzenie
-                        </Box>
-                    ) : (
-                        <Accordion allowToggle defaultIndex={0}>
-                            <AccordionItem border="none">
-                                <AccordionButton _expanded={{ bg: "blue.50" }} fontSize="xs" px={2} py={1}>
-                                    Wybierz typ zdarzenia
-                                </AccordionButton>
-                                <AccordionPanel pb={1} px={2}>
-                                    {EVENT_TYPES.map(type => (
-                                        <Button key={type.value} w="100%" my={0.5} py={0.5} px={2} fontSize="xs" borderRadius="sm" onClick={() => handleTypeSelect(type.label)}>
-                                            {type.label}
-                                        </Button>
-                                    ))}
-                                </AccordionPanel>
-                            </AccordionItem>
-                        </Accordion>
-                    )}
-                </Box>
-            )}
+            <IncidentReportPopup></IncidentReportPopup>
         </Box>
     );
 }

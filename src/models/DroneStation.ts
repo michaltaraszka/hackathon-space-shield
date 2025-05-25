@@ -3,7 +3,7 @@ import type {Location} from "./Location.ts";
 
 export interface DroneStation {
     position: Location
-    name: string
+    id: string // Unique identifier for the drone station
     drones: Drone[]
 }
 
