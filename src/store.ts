@@ -65,7 +65,7 @@ export const useStore = create<Store>()(
                         }
                     }
                 }),
-            uploadMissionPhotos: (missionId: string, photo: { rgbUrl: string, thermalUrl: string, lidarUrl: string }) =>
+            uploadMissionPhotos: (missionId: string, photo: Photo) =>
                 set((state) => {
                     const mission = state.missions.find(m => m.missionId === missionId);
                     if (mission) {
@@ -77,7 +77,7 @@ export const useStore = create<Store>()(
                             rgbUrl: photo.rgbUrl,
                             thermalUrl: photo.thermalUrl,
                             lidarUrl: photo.lidarUrl
-                        });
+                        } as Photo);
                     }
                 }),
             updateDronePosition: (droneId: string, position: Location) =>

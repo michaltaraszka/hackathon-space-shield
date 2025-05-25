@@ -25,7 +25,7 @@ interface PhotoGalleryPopoverProps {
 }
 
 export const PhotoGalleryPopover: React.FC<PhotoGalleryPopoverProps> = ({ photos }) => {
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const {onOpen} = useDisclosure();
     const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
     const photoUrls = photos.flatMap(photo => [photo.rgbUrl, photo.thermalUrl, photo.lidarUrl]).filter(url => url); // Flatten and filter out empty URLs
 
@@ -58,7 +58,7 @@ export const PhotoGalleryPopover: React.FC<PhotoGalleryPopoverProps> = ({ photos
                                         cursor="pointer"
                                         borderRadius="md"
                                         _hover={{ opacity: 0.8 }}
-                                        onClick={() => setSelectedPhoto(url)}
+                                        onClick={() => setSelectedPhoto(url!)}
                                         objectFit="cover"
                                         boxSize="100px"
                                     />
