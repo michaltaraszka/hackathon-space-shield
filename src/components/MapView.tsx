@@ -50,10 +50,14 @@ export const MapViewComponent: React.FC = () => {
 
                 {droneStations.map(station => (
                     <React.Fragment key={station.id}>
-                        <DroneStationGradientCircle center={[station.position.latitude, station.position.longitude]} />
+                        <DroneStationGradientCircle
+                            center={[station.position.latitude, station.position.longitude]}
+                            highlight={selectedStation === station.id}
+                        />
                         <Marker
                             position={[station.position.latitude, station.position.longitude]}
                             icon={DroneStationIcon}
+                            className={selectedStation === station.id ? 'highlighted-marker' : ''}
                         >
                             <Popover>Custom styled marker</Popover>
                         </Marker>

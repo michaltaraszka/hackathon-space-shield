@@ -75,7 +75,7 @@ export const DroneStationCircle = ({ center }: { center: [number, number] }) => 
 );
 
 
-export const DroneStationGradientCircle = ({ center }: { center: [number, number] }) => {
+export const DroneStationGradientCircle = ({ center, highlight = false }: { center: [number, number], highlight?: boolean }) => {
     const R = 6378137;
     const lat = center[0] * Math.PI / 180;
     const dLat = (10000 / R) * (180 / Math.PI);
@@ -85,7 +85,7 @@ export const DroneStationGradientCircle = ({ center }: { center: [number, number
         [center[0] + dLat, center[1] + dLon]
     ] as L.LatLngBoundsExpression;
     return (
-        <SVGOverlay bounds={bounds} zIndex={200}>
+        <SVGOverlay bounds={bounds} zIndex={highlight ? 300 : 200}>
             <svg width="100%" height="100%" viewBox="0 0 100 100">
                 <defs>
                     <radialGradient id="grad" cx="50%" cy="50%" r="50%">
@@ -94,7 +94,7 @@ export const DroneStationGradientCircle = ({ center }: { center: [number, number
                         <stop offset="100%" stopColor="#7c3aed" stopOpacity="0.05" />
                     </radialGradient>
                 </defs>
-                <circle cx="50" cy="50" r="50" fill="url(#grad)" stroke="#000" strokeWidth="0.05" />
+                <circle cx="50" cy="50" r="50" fill="url(#grad)" stroke={highlight ? "#fff" : "#000"} strokeWidth={highlight ? 1.5 : 0.05} />
             </svg>
         </SVGOverlay>
     );
