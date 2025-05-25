@@ -1,0 +1,71 @@
+import type {MissionStatus, Photo} from "./models/Mission.ts";
+import type {DroneStation} from "./models/DroneStation.ts";
+import type {Drone} from "./models/Drone.ts";
+import type {Incident} from "./models/Incident.ts";
+import type {Location} from "./models/Location.ts";
+import {getDistanceMeters} from "./services.ts";
+
+export const mockDroneMission = (
+    missionId: string,
+    baseStation: DroneStation,
+    drone: Drone,
+    incident: Incident,
+    updateDronePosition: (droneId: string, position: Location) => void,
+    updateDroneStatus: (droneId: string, status: MissionStatus) => void,
+    uploadDronePhoto: (missionId: string, photo: Photo) => void,
+    timeScale: number = 1 // 1 = real-time; 2 = twice as fast, etc.
+) => {
+    const warmUpTime = (60 * 1000) / timeScale; // 1 minute warm-up time scaled by time
+    const flightSpeed = (50 / 3.6) * timeScale; // m/s scaled by time
+    const surveyTime = (60 * 1000 * 5) / timeScale; // 5 minutes survey time scaled by time
+    const homePosition = baseStation.position;
+    const incidentPosition = incident.data.location;
+
+    const totalDistance = getDistanceMeters(
+        homePosition.latitude,
+        homePosition.longitude,
+        incidentPosition.latitude,
+        incidentPosition.longitude
+    );
+
+    const flightTime = (totalDistance / flightSpeed) * 1000; // milliseconds
+
+    const totalMissionTime = warmUpTime + flightTime + surveyTime + flightTime;
+    let elapsedTime = 0;
+
+    const interval = setInterval(() => {
+        elapsedTime += 1000;
+
+        if (elapsedTime < warmUpTime) {
+            updateDroneStatus(missionId, 'WARM_UP'); // warming up
+        } else if (elapsedTime < warmUpTime + flightTime) {
+            updateDroneStatus(missionId, 'ON_WAY');
+            const progress = (elapsedTime - warmUpTime) / flightTime;
+            const currentPosition = {
+                latitude: homePosition.latitude + (incidentPosition.latitude - homePosition.latitude) * progress,
+                longitude: homePosition.longitude + (incidentPosition.longitude - homePosition.longitude) * progress
+            };
+            updateDronePosition(drone.id, currentPosition);
+        } else if (elapsedTime < warmUpTime + flightTime + surveyTime) {
+            updateDroneStatus(missionId, 'SURVEY');
+            const photo: Photo = {
+                rgbUrl: 'http://example.com/rgb_photo.jpg',
+                thermalUrl: 'http://example.com/thermal_photo.jpg',
+                lidarUrl: 'http://example.com/lidar_photo.jpg'
+            };
+            uploadDronePhoto(missionId, photo);
+        } else if (elapsedTime < totalMissionTime) {
+            updateDroneStatus(missionId, 'ON_RETURN');
+            const progress = (totalMissionTime - elapsedTime) / flightTime;
+            const currentPosition = {
+                latitude: homePosition.latitude + (incidentPosition.latitude - homePosition.latitude) * progress,
+                longitude: homePosition.longitude + (incidentPosition.longitude - homePosition.longitude) * progress
+            };
+            updateDronePosition(drone.id, currentPosition);
+        } else {
+            clearInterval(interval);
+            updateDroneStatus(missionId, 'COMPLETED');
+            updateDronePosition(drone.id, homePosition);
+        }
+    }, 100); // still runs every 1 real second
+};

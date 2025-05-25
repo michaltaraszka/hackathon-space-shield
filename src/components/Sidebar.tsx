@@ -1,13 +1,10 @@
 import { Box, VStack, Heading, Text, Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon, Badge, Flex, Progress } from "@chakra-ui/react";
 import { useStore } from "../store";
 
-interface SidebarProps {
-  selectedStation: string | null;
-  onSelectStation: (name: string) => void;
-}
-
-export const Sidebar: React.FC<SidebarProps> = ({ selectedStation, onSelectStation }) => {
+export const Sidebar: React.FC = () => {
   const stations = useStore(state => state.stations);
+  const selectedStation = useStore(state => state.view.selectedStationId);
+  const setSelectedStation = useStore(state => state.view.setSelectedStationId);
   return (
     <Box w="300px" bg="gray.800" color="white" p={4} h="100vh">
       <VStack align="start" spacing={4}>
@@ -19,7 +16,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ selectedStation, onSelectStati
               <AccordionIcon />
             </AccordionButton>
             <AccordionPanel pb={2}>
-              <Accordion allowToggle w="100%" defaultIndex={stations.findIndex(s => s.name === selectedStation)}>
+              <Accordion allowToggle w="100%" defaultIndex={stations.findIndex(s => s.id === selectedStation)}>
                 {stations.length === 0 ? (
                   <AccordionItem border="none">
                     <AccordionButton>
@@ -28,19 +25,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ selectedStation, onSelectStati
                   </AccordionItem>
                 ) : (
                   stations.map(station => (
-                    <AccordionItem key={station.name} border="none">
+                    <AccordionItem key={station.id} border="none">
                       <AccordionButton
-                        bg={selectedStation === station.name ? "gray.700" : "transparent"}
-                        color={selectedStation === station.name ? "blue.300" : "gray.200"}
-                        fontWeight={selectedStation === station.name ? "bold" : "normal"}
+                        bg={selectedStation === station.id ? "gray.700" : "transparent"}
+                        color={selectedStation === station.id ? "blue.300" : "gray.200"}
+                        fontWeight={selectedStation === station.id ? "bold" : "normal"}
                         borderRadius="md"
                         px={2}
                         py={1}
                         _hover={{ bg: "gray.700", color: "blue.200" }}
-                        onClick={() => onSelectStation(station.name)}
+                        onClick={() => setSelectedStation(station.id)}
                       >
                         <Flex flex="1" textAlign="left" align="center">
-                          {station.name}
+                          {station.id}
                           <Badge ml={2} colorScheme="green">Online</Badge>
                         </Flex>
                         <AccordionIcon />

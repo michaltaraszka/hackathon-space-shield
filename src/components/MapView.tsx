@@ -29,6 +29,7 @@ export const MapViewComponent: React.FC = () => {
     const dronesWithMissions = drones.filter(drone => missions.some(mission => mission.droneId === drone.id))
     // filter out drones that finish their missions
     .filter(drone => !missions.some(mission => mission.droneId === drone.id && (mission.status === 'COMPLETED' || mission.status === 'CANCELED' || mission.status === 'FAILED')));
+    const selectedStation = useStore((state) => state.view.selectedStationId);
 
     // Fix leaflet's default icon issue in many bundlers:
     delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -57,7 +58,7 @@ export const MapViewComponent: React.FC = () => {
                         <Marker
                             position={[station.position.latitude, station.position.longitude]}
                             icon={DroneStationIcon}
-                            className={selectedStation === station.id ? 'highlighted-marker' : ''}
+                            //className={selectedStation === station.id ? 'highlighted-marker' : ''}
                         >
                             <Popover>Custom styled marker</Popover>
                         </Marker>

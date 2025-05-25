@@ -19,6 +19,8 @@ export interface Store {
     view: {
         map: MapView
         incidentPopup: IncidentPopupView
+        selectedStationId: string | null
+        setSelectedStationId: (stationId: string | null) => void
     }
 }
 
@@ -149,6 +151,12 @@ export const useStore = create<Store>()(
                             state.view.incidentPopup.position = {x: 0, y: 0};
                         });
                     }
+                },
+                selectedStationId: null,
+                setSelectedStationId: (stationId: string | null) => {
+                    set((state) => {
+                        state.view.selectedStationId = stationId;
+                    });
                 }
             }
         }
