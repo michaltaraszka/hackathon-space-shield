@@ -124,12 +124,44 @@ export const useStore = create<Store>()(
                 {
                     id: "SW_GS_02",
                     position: { latitude: 50.56696576099246, longitude: 22.276527842754125 },
-                    drones: []
+                    drones: [
+                        {
+                            id: "SW_D_03",
+                            position: { latitude: 50.56696576099246, longitude: 22.276527842754125 },
+                            battery: 100,
+                            status: 'IDLE',
+                        },
+                        {
+                            id: "SW_D_04",
+                            position: { latitude: 50.56696576099246, longitude: 22.276527842754125 },
+                            battery: 100,
+                            status: 'IDLE',
+                        }
+                    ]
                 },
                 {
                     id: "SW_GS_03",
                     position: { latitude: 50.39696576099246, longitude: 22.316527842754125 },
-                    drones: []
+                    drones: [
+                        {
+                            id: "SW_D_05",
+                            position: { latitude: 50.39696576099246, longitude: 22.316527842754125 },
+                            battery: 100,
+                            status: 'IDLE',
+                        },
+                        {
+                            id: "SW_D_06",
+                            position: { latitude: 50.39696576099246, longitude: 22.316527842754125 },
+                            battery: 100,
+                            status: 'IDLE',
+                        },
+                        {
+                            id: "SW_D_07",
+                            position: { latitude: 50.39696576099246, longitude: 22.316527842754125 },
+                            battery: 100,
+                            status: 'IDLE',
+                        }
+                    ]
                 }
             ],
             incidents: [],

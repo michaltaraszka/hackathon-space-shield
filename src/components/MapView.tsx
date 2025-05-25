@@ -56,7 +56,7 @@ export const MapViewComponent: React.FC = () => {
         <Box position="relative" w="100%" h="100%">
             <MapContainer
                 center={[centerLocation.latitude, centerLocation.longitude]}
-                zoom={13}
+                zoom={11}
                 style={{height: "100%", width: "100%"}}
             >
                 <RightClickHandler/>
